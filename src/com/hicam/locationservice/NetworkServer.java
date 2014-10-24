@@ -37,13 +37,8 @@ public class NetworkServer {
         Log.v(TAG, "Server launch");
     }
 
-    private void service()  throws IOException{
-        Log.v(TAG, "mExecutorService.isShutdown():"+mExecutorService.isShutdown());
-        Log.v(TAG, "mExecutorService.isTerminated():"+mExecutorService.isTerminated());
-        mServerSocket = new ServerSocket(mPort);
-        mServerSocket.setReuseAddress(true);
+    private void service() {
         mExecutorService.execute(new SubMainHandler());
-
     }
 
     public static final NetworkServer getInstance() throws IOException {
@@ -58,12 +53,7 @@ public class NetworkServer {
     public void start() {
         Log.v(TAG, "start()");
         mRun = true;
-        try {
-            service();
-        } catch (IOException e) {
-            Log.e(TAG, e.getMessage());
-            e.printStackTrace();
-        }
+        service();
     }
 
     public void stop() {
@@ -72,12 +62,9 @@ public class NetworkServer {
         long beginTime = System.currentTimeMillis();
         if(mSendHandler != null) {
             mSendHandler.removeAll();
-            mSendHandler = null;
         }
         try {
-            if(mServerSocket != null) {
-                mServerSocket.close();
-            }
+            mServerSocket.close();
             for(Socket s: mAcceptSocketList) {
                 s.close();
             }
