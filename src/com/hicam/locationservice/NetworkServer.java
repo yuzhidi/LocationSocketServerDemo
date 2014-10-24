@@ -37,7 +37,15 @@ public class NetworkServer {
         Log.v(TAG, "Server launch");
     }
 
-    private void service() {
+    private void service() throws IOException {
+        Log.v(TAG,
+                "mExecutorService.isShutdown():"
+                        + mExecutorService.isShutdown());
+        Log.v(TAG,
+                "mExecutorService.isTerminated():"
+                        + mExecutorService.isTerminated());
+        mServerSocket = new ServerSocket(mPort);
+        mServerSocket.setReuseAddress(true);
         mExecutorService.execute(new SubMainHandler());
     }
 
@@ -53,19 +61,27 @@ public class NetworkServer {
     public void start() {
         Log.v(TAG, "start()");
         mRun = true;
-        service();
+        try {
+            service();
+        } catch (IOException e) {
+            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
+        }
     }
 
     public void stop() {
         Log.v(TAG, "stop()");
         mRun = false;
         long beginTime = System.currentTimeMillis();
-        if(mSendHandler != null) {
+        if (mSendHandler != null) {
             mSendHandler.removeAll();
+            mSendHandler = null;
         }
         try {
-            mServerSocket.close();
-            for(Socket s: mAcceptSocketList) {
+            if (mServerSocket != null) {
+                mServerSocket.close();
+            }
+            for (Socket s : mAcceptSocketList) {
                 s.close();
             }
             mAcceptSocketList.clear();
@@ -74,17 +90,17 @@ public class NetworkServer {
             e.printStackTrace();
         }
 
-//        mExecutorService.shutdown();
-//        while (!mExecutorService.isTerminated()) {
-//            Log.v(TAG, "stop() wait thread terminated"); 
-//            try {
-//                // time out 1 second
-//                mExecutorService.awaitTermination(1, TimeUnit.SECONDS);
-//            } catch (InterruptedException e) {
-//                Log.e(TAG, "terminate thread pool fail");
-//                e.printStackTrace();
-//            }
-//        }
+        // mExecutorService.shutdown();
+        // while (!mExecutorService.isTerminated()) {
+        // Log.v(TAG, "stop() wait thread terminated");
+        // try {
+        // // time out 1 second
+        // mExecutorService.awaitTermination(1, TimeUnit.SECONDS);
+        // } catch (InterruptedException e) {
+        // Log.e(TAG, "terminate thread pool fail");
+        // e.printStackTrace();
+        // }
+        // }
         long endTime = System.currentTimeMillis();
         Log.v(TAG, "close server duration:" + (endTime - beginTime));
     }
@@ -116,14 +132,13 @@ public class NetworkServer {
                     e.printStackTrace();
                 }
             }
-            Log.v(TAG,"SubMainHandler is over");
+            Log.v(TAG, "SubMainHandler is over");
         }
 
     }
 
     private class SendHandler implements Runnable {
         ArrayList<PrintWriter> mSoclist = new ArrayList<PrintWriter>();
-        
 
         public void addSocket(PrintWriter s) {
             Log.v(TAG, "addSocket," + s);
@@ -141,6 +156,7 @@ public class NetworkServer {
         public void removeAll() {
             mSoclist.clear();
         }
+
         @Override
         public void run() {
             while (mRun) {
@@ -154,7 +170,7 @@ public class NetworkServer {
                 }
 
                 if (mSoclist.size() == 0) {
-//                    Log.v(TAG, "not socket need send, continue");
+                    // Log.v(TAG, "not socket need send, continue");
                     continue;
                 }
                 Log.v(TAG, "Send thread send message");
@@ -220,8 +236,7 @@ public class NetworkServer {
                     e.printStackTrace();
                 }
             }
-            Log.v(TAG, "Thread " + Thread.currentThread().getId()
-                    + " is over");
+            Log.v(TAG, "Thread " + Thread.currentThread().getId() + " is over");
         }
     }
 }
