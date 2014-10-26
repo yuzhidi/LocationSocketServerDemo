@@ -16,6 +16,7 @@ public class MainActivity extends Activity implements OnClickListener {
     private boolean mIsClientBind;
     private LocationSocketServer mServerBinder;
     private LocationSocketClient mClientBinder;
+    private NetworkState mNetworkState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +31,16 @@ public class MainActivity extends Activity implements OnClickListener {
         findViewById(R.id.stop_client_socket).setOnClickListener(this);
         findViewById(R.id.start_server_socket).setOnClickListener(this);
         findViewById(R.id.stop_server_socket).setOnClickListener(this);
+        mNetworkState = new NetworkState(this);
+        mNetworkState.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mNetworkState != null) {
+            mNetworkState.stop();
+        }
     }
 
     @Override
@@ -66,8 +77,8 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             break;
         case R.id.start_server_socket:
-            if(mIsServerBind) {
-                if(mServerBinder.getNetworkServer() == null) {
+            if (mIsServerBind) {
+                if (mServerBinder.getNetworkServer() == null) {
                     Log.v(TAG, "network server is null!!!");
                     break;
                 }
@@ -75,8 +86,8 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             break;
         case R.id.stop_server_socket:
-            if(mIsServerBind) {
-                if(mServerBinder.getNetworkServer() == null) {
+            if (mIsServerBind) {
+                if (mServerBinder.getNetworkServer() == null) {
                     Log.v(TAG, "network server is null!!!");
                     break;
                 }
@@ -84,8 +95,8 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             break;
         case R.id.start_client_socket:
-            if(mIsClientBind) {
-                if(mClientBinder.getNetworkClient() == null) {
+            if (mIsClientBind) {
+                if (mClientBinder.getNetworkClient() == null) {
                     Log.v(TAG, "network server is null!!!");
                     break;
                 }
@@ -93,8 +104,8 @@ public class MainActivity extends Activity implements OnClickListener {
             }
             break;
         case R.id.stop_client_socket:
-            if(mIsClientBind) {
-                if(mClientBinder.getNetworkClient() == null) {
+            if (mIsClientBind) {
+                if (mClientBinder.getNetworkClient() == null) {
                     Log.v(TAG, "network server is null!!!");
                     break;
                 }
