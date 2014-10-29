@@ -4,8 +4,10 @@
     android:versionCode="1"
     android:versionName="1.0" >
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
     <uses-sdk
         android:minSdkVersion="10"
         android:targetSdkVersion="18" />
@@ -24,8 +26,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <service android:name="com.hicam.locationservice.LocationSocketServer"></service>
-        <service android:name="com.hicam.locationservice.LocationSocketClient"></service>
+
+        <service android:name="com.hicam.locationservice.LocationSocketServer" >
+        </service>
+        <service android:name="com.hicam.locationservice.LocationSocketClient" >
+        </service>
     </application>
 
 </manifest>
